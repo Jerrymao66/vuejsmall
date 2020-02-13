@@ -1,7 +1,7 @@
 <template>
-  <div class="goods-item">
+  <div class="goods-item" @click="itemClick">
       <div>
-          <img :src="goodsItem.show.img" alt="">
+          <img :src="getImg" @load="imageLoad">
       </div>
       <div class="goods-info">
           <p>{{goodsItem.title}}</p>
@@ -20,15 +20,33 @@ export default {
                 return {}
             }
         }
+    },
+    methods: {
+        //每张图片加载完成后拿到Scroll组件中的srcoll 调用其中的refresh方法刷新高度
+        imageLoad(){
+            //通过注册好的事件总线,跨组件发射到home 拿到scroll对象 
+            let currPath = this.$route.path
+            if(currPath.indexOf("/home")!==-1)
+                this.$bus.$emit("imgload")    
+            else this.$bus.$emit("detailImgload")
+        },
+        itemClick(){
+            this.$router.push('/detail/'+this.goodsItem.iid||this.goodsItem.item_id)
+        }
+    },
+    computed: {
+        getImg() {
+        return this.goodsItem.img || this.goodsItem.image || this.goodsItem.show.img
+      }
     }
 }
 </script>
 
-<style >
+<style scoped>
 .goods-item {
     padding-bottom: 40px;
     position: relative;
-    width: 48%;
+    width: 45%;
   }
 .goods-item img {
     width: 100%;
